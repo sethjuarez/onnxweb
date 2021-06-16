@@ -49,7 +49,7 @@ export default function Home() {
                 <div key={"probs_" + i} className="p-3 m-3 text-lg border border-gray-800 rounded-md w-36 h-14">
                   <span className="font-bold text-left text-red-700">{i}</span>:
                   <span className="ml-2 text-right">
-                    {(p < .01 ? 0 : p * 100).toPrecision(3)}%
+                    {(p < .001 ? 0 : p * 100).toPrecision(3)}%
                   </span>
                 </div>
               ))}
