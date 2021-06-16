@@ -1,12 +1,17 @@
 import React, { MouseEvent, useState, useRef } from "react";
 
+export interface DrawProps {
+  onSet: (t: Float32Array) => void;
+  onClear: () => void;
+}
+
 type MouseState = {
   x: number;
   y: number;
   down?: boolean;
 };
 
-const Draw = () => {
+const Draw = ({ onSet, onClear }: DrawProps) => {
   const [mouse, setMouse] = useState<MouseState>({ x: 0, y: 0, down: false });
   const canvas = useRef<HTMLCanvasElement>(null);
   const miniCanvas = useRef<HTMLCanvasElement>(null);
@@ -16,7 +21,6 @@ const Draw = () => {
     return {
       x: mouse.x - (rect?.left ?? 0),
       y: mouse.y - (rect?.top ?? 0),
-      down: mouse.down,
     };
   };
 
@@ -36,6 +40,7 @@ const Draw = () => {
       if (ctx !== null) {
         const pos = getCurrentMousePos();
         ctx.lineTo(pos.x, pos.y);
+        ctx.imageSmoothingEnabled = true;
         ctx.lineCap = "round";
         ctx.strokeStyle = "#000000";
         ctx.lineWidth = 15;
@@ -56,6 +61,7 @@ const Draw = () => {
   const handleClear = () => {
     if (canvas.current !== null) clearCanvas(canvas.current);
     if (miniCanvas.current !== null) clearCanvas(miniCanvas.current);
+    onClear();
   };
 
   const getDigit = (): Array<number> | null => {
@@ -103,12 +109,15 @@ const Draw = () => {
 
   const handleSet = () => {
     const d = getDigit();
+    if (d !== null) {
+      onSet(new Float32Array(d));
+    }
   };
 
   return (
     <div id="draw">
       <canvas
-        className="border border-gray-600"
+        className="object-center border border-gray-600"
         ref={canvas}
         onMouseUp={handleMouseUp}
         onMouseDown={handleMouseDown}
@@ -116,7 +125,12 @@ const Draw = () => {
         width="250px"
         height="250px"
       ></canvas>
-      <canvas ref={miniCanvas} width="28" height="28"></canvas>
+      <canvas
+        className="absolute bottom-2 right-2"
+        ref={miniCanvas}
+        width="28"
+        height="28"
+      ></canvas>
       <div className="mt-6">
         <button
           className="w-24 py-3 mr-4 text-2xl font-semibold text-white bg-blue-600 rounded-md focus:outline-none hover:ring-4"
